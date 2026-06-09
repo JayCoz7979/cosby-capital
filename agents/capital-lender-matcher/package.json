@@ -1,0 +1,17 @@
+{
+  "name": "capital-lender-matcher",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "engines": { "node": ">=20.0.0" },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "0.24.3",
+    "@supabase/supabase-js": "2.39.3",
+    "node-cron": "3.0.3",
+    "resend": "2.1.0",
+    "zod": "3.22.4"
+  }
+}
