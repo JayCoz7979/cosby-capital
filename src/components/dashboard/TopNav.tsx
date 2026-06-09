@@ -6,14 +6,19 @@
  * Fixed 64px height (set by DashboardShell wrapper div).
  * Left: logo (mobile) + mobile menu trigger.
  * Right: notification bell with unread dot + avatar dropdown.
+ *
+ * unreadCount is sourced from NotificationContext (managed by NotificationFeed).
+ * DashboardShell wraps everything in NotificationContextProvider so the value
+ * is always available here.
  */
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { MobileMenuButton, SidebarDrawer } from "./Sidebar";
+import { useNotificationContext } from "@/components/dashboard/NotificationContext";
 
 interface TopNavProps {
   clientName?: string;
@@ -29,29 +34,8 @@ function getInitials(name?: string): string {
 
 export function TopNav({ clientName, tier = "starter" }: TopNavProps) {
   const router = useRouter();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const { unreadCount } = useNotificationContext();
   const [drawerOpen, setDrawerOpen] = useState(false);
-
-  // Fetch unread notification count — graceful degradation if route 404s
-  useEffect(() => {
-    let cancelled = false;
-    async function fetchUnread() {
-      try {
-        const res = await fetch("/api/dashboard/notifications?unread_count=1");
-        if (!res.ok) return; // 404 is expected until Plan 04-06
-        const data = await res.json();
-        if (!cancelled && typeof data.count === "number") {
-          setUnreadCount(data.count);
-        }
-      } catch {
-        // Network error — leave count at 0
-      }
-    }
-    fetchUnread();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   const handleSignOut = useCallback(async () => {
     router.push("/auth/signout");
