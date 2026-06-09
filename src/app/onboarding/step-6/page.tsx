@@ -4,13 +4,13 @@
  * Step 6 — Subscription Selection
  *
  * Shows 4 tier cards with annual/monthly toggle.
- * Stripe checkout NOT wired yet (Plan 02-05) — "Select Plan" navigates to
- * /dashboard for now with a free trial flow note.
+ * On plan select: POSTs to /api/stripe/create-checkout and redirects to Stripe.
+ * Handles ?success=true (redirect to dashboard after 2s) and ?canceled=true.
  * FTC affiliate disclosure shown at bottom.
  */
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type BillingPeriod = "monthly" | "annual";
 
@@ -101,10 +101,29 @@ const TIERS: Tier[] = [
 
 export default function Step6Page() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [billing, setBilling] = useState<BillingPeriod>("monthly");
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [checkoutStatus, setCheckoutStatus] = useState<"success" | "canceled" | null>(null);
+
+  // Handle Stripe redirect-back query params
+  useEffect(() => {
+    const success = searchParams.get("success");
+    const canceled = searchParams.get("canceled");
+    if (success === "true") {
+      setCheckoutStatus("success");
+      // Redirect to dashboard after 2 seconds
+      const timer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    if (canceled === "true") {
+      setCheckoutStatus("canceled");
+    }
+  }, [searchParams, router]);
 
   async function handleSelectPlan(tierId: string) {
     if (tierId === "done_for_you") {
@@ -113,11 +132,12 @@ export default function Step6Page() {
     }
 
     setError(null);
+    setCheckoutStatus(null);
     setSelectedTier(tierId);
     setLoading(true);
 
     try {
-      // Save step 6 data
+      // Save step 6 data before redirecting to Stripe
       const saveRes = await fetch("/api/onboarding/save-step", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -138,22 +158,32 @@ export default function Step6Page() {
         return;
       }
 
-      // Mark onboarding complete
-      const completeRes = await fetch("/api/onboarding/complete", {
+      // Create Stripe Checkout Session and redirect
+      const checkoutRes = await fetch("/api/stripe/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tier: tierId,
+          billing_period: billing,
+        }),
       });
 
-      if (!completeRes.ok) {
-        const body = await completeRes.json() as { error?: string };
-        setError(body.error ?? "Failed to complete onboarding. Please try again.");
+      if (!checkoutRes.ok) {
+        const body = await checkoutRes.json() as { error?: string };
+        setError(body.error ?? "Failed to start checkout. Please try again.");
         setLoading(false);
         setSelectedTier(null);
         return;
       }
 
-      // Stripe not yet integrated (Plan 02-05) — redirect to dashboard for free trial
-      router.push("/dashboard");
+      const { url } = await checkoutRes.json() as { url: string };
+      if (url) {
+        window.location.href = url;
+      } else {
+        setError("Checkout URL not returned. Please try again.");
+        setLoading(false);
+        setSelectedTier(null);
+      }
     } catch {
       setError("Network error. Please check your connection and try again.");
       setLoading(false);
@@ -186,6 +216,24 @@ export default function Step6Page() {
         </p>
       </div>
 
+      {checkoutStatus === "success" && (
+        <div
+          role="status"
+          className="mb-6 rounded-lg bg-green-500/10 border border-green-500/30 px-4 py-3 text-sm text-green-400 font-body"
+        >
+          <span className="font-medium">Payment successful!</span> Setting up your account — redirecting to dashboard…
+        </div>
+      )}
+
+      {checkoutStatus === "canceled" && (
+        <div
+          role="alert"
+          className="mb-6 rounded-lg bg-yellow-500/10 border border-yellow-500/30 px-4 py-3 text-sm text-yellow-400 font-body"
+        >
+          Checkout canceled. Select a plan below when you&apos;re ready.
+        </div>
+      )}
+
       {error && (
         <div
           role="alert"
@@ -194,14 +242,6 @@ export default function Step6Page() {
           {error}
         </div>
       )}
-
-      {/* Stripe integration note */}
-      <div className="mb-6 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-        <p className="text-xs text-blue-300 font-body">
-          <span className="font-medium">Note:</span> Payment processing integration is coming soon.
-          Selecting a plan now will start your free trial and activate your dashboard.
-        </p>
-      </div>
 
       {/* Annual/Monthly toggle */}
       <div className="flex items-center justify-center mb-8">

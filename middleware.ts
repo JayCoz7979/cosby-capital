@@ -9,10 +9,12 @@
  * - Security headers on every response
  * - NO NODE_ENV bypass conditions anywhere (S12-003)
  * - Stripe + VAPI webhook routes excluded from auth matcher
+ * - Subscription tier feature gates on specific dashboard routes
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
 // ── Configuration ─────────────────────────────────────────────────────────────
 
@@ -54,6 +56,20 @@ const AUTH_PREFIXES: string[] = [
   "/auth/signup",
   "/auth/reset-password",
 ];
+
+/**
+ * Subscription tier feature gates.
+ * Key: exact route prefix. Value: minimum tier required.
+ * Tiers in ascending access order: starter < growth < capital_partner < done_for_you
+ *
+ * On insufficient tier: redirect to /dashboard/upgrade?feature=[route] (not 403).
+ */
+const TIER_REQUIRED_ROUTES: Record<string, string[]> = {
+  "/dashboard/grants/write": ["growth", "capital_partner", "done_for_you"],
+  "/dashboard/lenders/request-intro": ["growth", "capital_partner", "done_for_you"],
+  "/dashboard/credit/repair": ["done_for_you"],
+  "/dashboard/real-estate": ["capital_partner", "done_for_you"],
+};
 
 // ── Security headers applied to every response ────────────────────────────────
 
@@ -220,6 +236,44 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
       const dashboardUrl = new URL("/dashboard", request.url);
       const redirectResponse = NextResponse.redirect(dashboardUrl);
       return addSecurityHeaders(redirectResponse);
+    }
+
+    // ── 8. Subscription tier feature gates ─────────────────────────────────
+    // Only check gated routes for authenticated users on dashboard paths.
+    // Uses service_role client to bypass RLS — safe because this is server-only middleware.
+    const gatedRoute = Object.keys(TIER_REQUIRED_ROUTES).find((prefix) =>
+      pathname.startsWith(prefix)
+    );
+
+    if (gatedRoute) {
+      const allowedTiers = TIER_REQUIRED_ROUTES[gatedRoute];
+
+      try {
+        const serviceClient = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          { auth: { autoRefreshToken: false, persistSession: false } }
+        );
+
+        const { data: clientRecord } = await serviceClient
+          .from("clients")
+          .select("subscription_tier")
+          .eq("user_id", user.id)
+          .maybeSingle();
+
+        const userTier: string = clientRecord?.subscription_tier ?? "";
+
+        if (!allowedTiers.includes(userTier)) {
+          const upgradeUrl = new URL("/dashboard/upgrade", request.url);
+          upgradeUrl.searchParams.set("feature", gatedRoute);
+          const redirectResponse = NextResponse.redirect(upgradeUrl);
+          return addSecurityHeaders(redirectResponse);
+        }
+      } catch {
+        // On any error fetching tier, allow through — fail open to avoid
+        // locking out users due to DB connectivity issues. The feature
+        // pages themselves have server-side auth guards as a second layer.
+      }
     }
   }
 
