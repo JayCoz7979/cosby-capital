@@ -39,6 +39,10 @@ minimum_password_length = 12
 enable_signup = true
 double_confirm_changes = true
 enable_confirmations = true
+secure_email_change_enabled = true
+
+[auth.totp]
+issuer = "Cosby Capital"
 
 [auth.sms]
 enable_signup = false
