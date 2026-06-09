@@ -62,7 +62,7 @@ The dashboard uses a two-column shell: persistent left sidebar + main content ar
 ├──────────────┬─────────────────────────────────┤
 │  Sidebar     │  Main Content Area              │
 │  240px       │  flex-1, min-w-0                │
-│  bg-navy     │  bg-gray-50                     │
+│  bg-forest   │  bg-gray-50                     │
 │  (hidden on  │  px-6 py-8 (md: px-8)          │
 │   mobile,    │                                 │
 │   drawer)    │                                 │
@@ -70,8 +70,8 @@ The dashboard uses a two-column shell: persistent left sidebar + main content ar
 ```
 
 - Background dominant surface: `bg-gray-50` (#F9FAFB) for main content area
-- Sidebar background: `#0A1628` (navy) — matches auth/onboarding shell
-- Top nav background: `#0A1628` (navy) with bottom border `border-white/10`
+- Sidebar background: `#2D5016` (forest green) — brand primary; note: `tailwind.config.ts` currently defines a navy token that must be replaced with forest green during Phase 4 execution
+- Top nav background: `#2D5016` (forest green) with bottom border `border-white/10`
 - Cards float on the gray-50 surface as white panels
 
 ---
@@ -96,7 +96,7 @@ Note: Two font weights are declared: 400 (regular) for body text and 600 (semibo
 | Role | Value | Usage |
 |------|-------|-------|
 | Dominant (60%) | `#F9FAFB` (gray-50) | Main content area background, page background |
-| Secondary (30%) | `#0A1628` (navy) | Sidebar, top nav, card top-border accent, primary button background |
+| Secondary (30%) | `#2D5016` (forest green) | Sidebar, top nav, card top-border accent, primary button background |
 | Surface (cards) | `#FFFFFF` (white) | All card backgrounds, modal backgrounds, dropdown backgrounds |
 | Accent (10%) | `#C9A84C` (gold) | Reserved elements only — see list below |
 | Destructive | `#DC2626` (red-600) | Document delete confirmation, form error text, error toasts |
@@ -107,13 +107,13 @@ Accent (`#C9A84C`) reserved for:
 2. Grant match score badge fill
 3. Active sidebar navigation item indicator (left border + text)
 4. Notification dot (unread indicator)
-5. Primary CTA button text color (on navy background, matches existing Button variant="primary")
+5. Primary CTA button text color (on forest green background, Button variant="primary" background updated to #2D5016)
 6. Progress bar fill (extends OnboardingProgressBar pattern)
 7. "New" or "High Priority" status chip on grant/lender cards
 
 Accent is NOT used for: secondary buttons, ghost buttons, input focus rings on dark backgrounds, table row hover, general link text.
 
-Source: `tailwind.config.ts` colors, `src/components/ui/button.tsx`, `src/app/globals.css`
+Source: brand spec (Forest/Hunter Green #2D5016 as primary, Gold #C9A84C accent, White/Off-white surfaces, Charcoal text). `tailwind.config.ts` currently defines a navy token — this must be updated to forest green in the DashboardShell plan.
 
 ---
 
@@ -274,11 +274,11 @@ No third-party component registries are used. All components are built from scra
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (brand color corrected — Forest/Hunter Green #2D5016 replaces navy)
