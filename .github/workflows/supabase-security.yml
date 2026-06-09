@@ -1,0 +1,21 @@
+name: Supabase Security Advisor
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  advisor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Supabase Security Advisor (S11-004)
+        run: |
+          ERRORS=$(curl -s \
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ACCESS_TOKEN }}" \
+            "https://api.supabase.com/v1/projects/${{ secrets.SUPABASE_PROJECT_REF }}/advisors/security" \
+            | jq '[.[] | select(.level == "ERROR")] | length')
+          echo "Supabase Security Advisor: $ERRORS error-level issues found"
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "BLOCKED: Fix all Supabase Security Advisor errors before merging"
+            exit 1
+          fi
+          echo "Supabase Security Advisor: PASSED"

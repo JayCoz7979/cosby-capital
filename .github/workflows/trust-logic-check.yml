@@ -1,0 +1,27 @@
+name: Trust Logic Check
+on: [pull_request]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Check for dangerous eval/exec patterns (S15-003, S16-001)
+        run: |
+          if grep -rn "eval(\|exec(\|new Function(" src/ agents/ lib/ app/ 2>/dev/null \
+            | grep -v "node_modules\|\.test\.\|\.spec\."; then
+            echo "BLOCKED: eval/exec/new Function detected in source code (S16-001)"
+            exit 1
+          fi
+          echo "eval/exec/new Function check: PASSED"
+
+      - name: Check PR body for SYSTEM: prefix (GAP-221)
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if echo "$PR_BODY" | grep -q "SYSTEM:"; then
+            echo "BLOCKED: 'SYSTEM:' found in PR body — potential prompt injection (GAP-221)"
+            exit 1
+          fi
+          echo "PR body SYSTEM: check: PASSED"
