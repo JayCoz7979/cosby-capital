@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Plan 01-01 complete — scaffold, security configs, vercel.json, security.txt, npm install done
-last_updated: "2026-06-09T16:10:00.000Z"
-last_activity: 2026-06-09 -- Plan 01-01 executed (scaffold + security config files)
+stopped_at: Plan 01-03 complete — supabase config.toml + 4 migration files (schema, RLS, security tables, extensions)
+last_updated: "2026-06-09T17:10:00.000Z"
+last_activity: 2026-06-09 -- Plan 01-03 executed (Supabase migrations full schema + security tables)
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
-  percent: 3
+  completed_plans: 3
+  percent: 9
 ---
 
 # Project State
@@ -26,25 +26,25 @@ See: .planning/PROJECT.md (updated 2026-06-09)
 ## Current Position
 
 Phase: 01 (security-infrastructure) — EXECUTING
-Plan: 2 of 4 (01-01 complete, starting 01-02)
+Plan: 4 of 4 (01-01, 01-02, 01-03 complete, starting 01-04)
 Status: Executing Phase 01
-Last activity: 2026-06-09 -- Plan 01-01 complete
+Last activity: 2026-06-09 -- Plan 01-03 complete
 
-Progress: [█░░░░░░░░░] 3%
+Progress: [███░░░░░░░] 9%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 1
-- Average duration: 15 minutes
-- Total execution time: 0.25 hours
+- Total plans completed: 3
+- Average duration: 20 minutes
+- Total execution time: 1.0 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01 | 1 | 15 min | 15 min |
+| 01 | 3 | 60 min | 20 min |
 
 ## Accumulated Context
 
@@ -57,6 +57,10 @@ Progress: [█░░░░░░░░░] 3%
 - All AI prompts server-side only — never in browser JS
 - DMARC p=reject enforced before first email
 - worktrees disabled (USE_WORKTREES=false in config)
+- S11-012 enforced: every CREATE TABLE in migrations immediately followed by ENABLE ROW LEVEL SECURITY
+- anthropic_model pinned in platform_settings to 'claude-sonnet-4-6' (never 'latest')
+- admin_audit_log immutable via two-layer defense: trigger + REVOKE at role level
+- compliance_log deferred from migration 001 — no RLS pattern defined, excluded to preserve S11-012
 - @supabase/ssr pinned to 0.12.0 (0.1.0 had cookie CVE GHSA-pxg6-pf52-xh8x)
 - lucide-react pinned to 0.400.0 (0.309.0 incompatible with React 19)
 - @radix-ui/react-badge removed (package does not exist on npm)
@@ -67,8 +71,6 @@ Progress: [█░░░░░░░░░] 3%
 
 ### Pending Todos
 
-- 01-02: GitHub security files (workflows, PR template, dependabot)
-- 01-03: Supabase migrations (initial schema + RLS)
 - 01-04: Shared security utilities + middleware
 
 ### Blockers/Concerns
@@ -81,5 +83,5 @@ Progress: [█░░░░░░░░░] 3%
 ## Session Continuity
 
 Last session: 2026-06-09
-Stopped at: Plan 01-01 complete — all scaffold + security config files created and committed
+Stopped at: Plan 01-03 complete — supabase/config.toml + 4 migration files created and committed
 Resume file: None
