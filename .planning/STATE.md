@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_execute
-stopped_at: ~
-last_updated: "2026-06-09T00:00:00.000Z"
-last_activity: 2026-06-09 -- Phase 4 planned (6 plans, 2 waves)
+status: executing
+stopped_at: Plan 02-04 complete (2026-06-09)
+last_updated: "2026-06-09T23:13:07.821Z"
+last_activity: 2026-06-09
 progress:
   total_phases: 7
-  completed_phases: 4
-  total_plans: 8
-  completed_plans: 8
-  percent: 57
+  completed_phases: 3
+  total_plans: 20
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-09)
 ## Current Position
 
 Phase: 4
-Plan: Not started
-Status: Ready to execute (6 plans planned)
+Plan: 04 complete (document portal)
+Status: Executing — Plan 04-05 next
 Last activity: 2026-06-09
 
-Progress: [████████░░] 36%
+Progress: [████████░░] 40%
 
 ## Performance Metrics
 
@@ -52,6 +52,9 @@ Progress: [████████░░] 36%
 
 ### Decisions
 
+- client_documents ownership check joins through clients.user_id (not user_id directly); 50ms delay applied manually; verifyOwnership() cannot be used as-is for this table
+- Dialog.Header not exported by @radix-ui/react-dialog@1.0.5 — use plain div wrapper around Dialog.Title + Dialog.Description
+- ClamAV webhook optional at dev time: upload proceeds if CLAMAV_WEBHOOK_URL not set; scan failure removes orphaned storage file
 - Project uses Next.js 15.5.18 (pinned for CVE patches), React 19.0.6
 - Supabase for auth + DB + storage (not Firebase)
 - 18 Railway agents — no public HTTP domains (Supabase-only communication)
@@ -98,5 +101,5 @@ Progress: [████████░░] 36%
 ## Session Continuity
 
 Last session: 2026-06-09T00:00:00Z
-Stopped at: Plan 02-04 complete (2026-06-09)
+Stopped at: Plan 04-04 complete (2026-06-09)
 Resume file: None

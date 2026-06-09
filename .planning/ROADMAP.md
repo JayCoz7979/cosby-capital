@@ -81,10 +81,10 @@ Plans:
 **Plans**: 6 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — DashboardShell + Foundation + Notifications Migration (Wave 1)
-- [ ] 04-02-PLAN.md — Dashboard Home + Funding Readiness Score (Wave 2)
-- [ ] 04-03-PLAN.md — Grant Matches + Lender Matches (Wave 2)
-- [ ] 04-04-PLAN.md — Documents — upload, download, delete (Wave 2)
+- [x] 04-01-PLAN.md — DashboardShell + Foundation + Notifications Migration (Wave 1)
+- [x] 04-02-PLAN.md — Dashboard Home + Funding Readiness Score (Wave 2)
+- [x] 04-03-PLAN.md — Grant Matches + Lender Matches (Wave 2)
+- [x] 04-04-PLAN.md — Documents — upload, download, delete (Wave 2)
 - [ ] 04-05-PLAN.md — Approvals queue + Credit Roadmap (Wave 2)
 - [ ] 04-06-PLAN.md — Realtime Notifications (Wave 2)
 
@@ -124,7 +124,7 @@ Plans:
 | 1. Security + Infrastructure Foundation | 1/4 | In progress | - |
 | 2. Authentication + Onboarding | 0/5 | Not started | - |
 | 3. Agent Infrastructure + Core Agents | 0/TBD | Not started | - |
-| 4. Client Dashboard | 0/6 | Not started | - |
+| 4. Client Dashboard | 4/6 | In Progress|  |
 | 5. Landing Page + Admin + Launch Prep | 0/TBD | Not started | - |
 | 6. Revenue Features | 0/TBD | Not started | - |
 | 7. Scale + Intelligence | 0/TBD | Not started | - |
