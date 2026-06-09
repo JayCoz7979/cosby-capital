@@ -1,7 +1,8 @@
 ---
 phase: 4
 slug: client-dashboard
-status: draft
+status: approved
+reviewed_at: 2026-06-09
 shadcn_initialized: false
 preset: none
 created: 2026-06-09
@@ -82,11 +83,11 @@ The dashboard uses a two-column shell: persistent left sidebar + main content ar
 | Body | 14px | 400 (regular) | 1.5 | DM Sans | Table cell text, description copy, notification body |
 | Label | 14px | 600 (semibold) | 1.4 | DM Sans | Form labels, column headers, tab labels, stat labels |
 | Heading | 20px | 600 (semibold) | 1.3 | Playfair Display | Card titles, section headings, panel titles |
-| Display | 28px | 700 (bold) | 1.2 | Playfair Display | Page title (e.g. "Dashboard"), score numbers |
+| Display | 28px | 600 (semibold) | 1.2 | Playfair Display | Page title (e.g. "Dashboard"), score numbers |
 
 Source: extracted from `src/components/ui/card.tsx` (CardTitle: text-2xl/semibold), `src/components/ui/input.tsx` (labels: text-sm/medium), auth layout (h1: text-3xl/bold), globals.css
 
-Note: "medium" (500) is treated as the Label semibold tier in the codebase — using 600 semibold as the declared weight to cover both. No third weight is introduced.
+Note: Two font weights are declared: 400 (regular) for body text and 600 (semibold) for all label, heading, and display roles. No third weight is used.
 
 ---
 
@@ -147,7 +148,7 @@ Components to build for this phase (all new, none exist yet):
 |---------|-----------|
 | Request lender introduction | "Request Introduction" |
 | Upload a document | "Upload Document" |
-| Download a document | "Download" |
+| Download a document | "Download File" |
 | Delete a document | "Delete File" |
 | View grant match details | "View Match Details" |
 | Mark notification read | "Mark as Read" |
@@ -224,7 +225,7 @@ Components to build for this phase (all new, none exist yet):
 - Accepted MIME types communicated before drag-and-drop: PDF, DOCX, XLSX, PNG, JPG
 - Max size: 10 MB (shown as hint text below uploader)
 - Upload state: idle → uploading (progress bar, gold fill) → scanning (spinner + "Scanning for threats…") → complete (green checkmark + file row appears) → error (red message)
-- Signed URL download: clicking "Download" calls server-side API route — no direct Supabase Storage URL in browser
+- Signed URL download: clicking "Download File" calls server-side API route — no direct Supabase Storage URL in browser
 - Ownership verification enforced server-side (verifyOwnership() with 50ms minimum delay per STATE.md decisions)
 
 ### Realtime Notifications
