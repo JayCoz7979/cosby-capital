@@ -126,26 +126,28 @@ export async function POST(_req: NextRequest) {
     }
 
     // ── Fire post-onboarding agent triggers ───────────────────────────────────
-    // Queue agents 1 (Capital Finder), 5 (Grant Finder), 8 (Credit Roadmap)
-    // agent_queue table may not exist yet in early phases — fail gracefully
+    // Enqueue agents 1, 5, 8 via agent_trigger_queue (used by all Phase 3 agents)
     if (clientRecord?.id) {
-      const agentTriggers = [1, 5, 8].map((agentId) => ({
-        client_id: clientRecord.id,
-        agent_id: agentId,
-        trigger: "onboarding_complete",
-        status: "queued",
-        created_at: new Date().toISOString(),
-      }));
+      const agentsToFire = [
+        "capital-grant-finder",
+        "capital-lender-matcher",
+        "capital-credit-coach",
+      ];
+      for (const agentName of agentsToFire) {
+        const { error: queueErr } = await serviceClient
+          .from("agent_trigger_queue")
+          .insert({
+            agent_name: agentName,
+            client_id: clientRecord.id,
+            trigger_type: "signup",
+            status: "pending",
+          });
 
-      const { error: queueErr } = await serviceClient
-        .from("agent_queue")
-        .insert(agentTriggers);
-
-      if (queueErr) {
-        // Table may not exist yet — log but don't fail the response
-        logger.warn("onboarding/complete: agent_queue insert failed (table may not exist yet)", {
-          error: queueErr.message,
-        });
+        if (queueErr) {
+          logger.warn(`onboarding/complete: agent_trigger_queue insert failed for ${agentName}`, {
+            error: queueErr.message,
+          });
+        }
       }
     }
 
