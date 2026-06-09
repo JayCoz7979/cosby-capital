@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --navy: #0a1628;
+  --gold: #c9a84c;
+  --navy-light: #1a2d4a;
+  --gold-light: #d4b86a;
+  --foreground: #0a1628;
+  --background: #ffffff;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    @apply bg-white text-[#0a1628] antialiased;
+    font-family: var(--font-dm-sans), system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-playfair), Georgia, serif;
+  }
+}
+
+@layer utilities {
+  .text-navy {
+    color: var(--navy);
+  }
+
+  .text-gold {
+    color: var(--gold);
+  }
+
+  .bg-navy {
+    background-color: var(--navy);
+  }
+
+  .bg-gold {
+    background-color: var(--gold);
+  }
+
+  .border-gold {
+    border-color: var(--gold);
+  }
+
+  .border-navy {
+    border-color: var(--navy);
+  }
+}
