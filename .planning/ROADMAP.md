@@ -43,7 +43,7 @@ Plans:
   3. All 6 onboarding steps complete with KYB, OFAC screening, and consulting agreement e-signature
   4. Stripe subscription activates correctly for all 4 tiers (monthly + annual)
   5. PCI SAQ A documentation complete
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
 - [ ] 02-01: Supabase Auth setup + auth pages (login, signup with Turnstile, forgot-password, verify-email)
