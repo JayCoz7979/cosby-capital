@@ -15,6 +15,12 @@ const config: Config = {
           100: "#0d1f38",
           900: "#060e1a",
         },
+        forest: {
+          DEFAULT: "#2D5016",
+          50: "#3d6b1e",
+          100: "#2d5016",
+          900: "#1a2e0d",
+        },
         gold: {
           DEFAULT: "#C9A84C",
           light: "#d4b96a",
