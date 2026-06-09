@@ -60,7 +60,14 @@ Plans:
   2. Agent 14 (healthcheck) deployed and monitoring all other agents
   3. All agents use sanitizeForPrompt(), scanOutputConfidentiality(), Zod validation, circuit breaker
   4. Agent emails require client_approved=true before sending
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [x] 03-01: Shared agent utilities (agents/lib/) + migration 000010 (agent_emails, compliance_log, platform_health_log, agent_trigger_queue)
+- [x] 03-02: Agent 14 (capital-healthcheck) — deploy first, monitors all other agents, every 15min + daily 5am report
+- [x] 03-03: Agent 1 (capital-grant-finder) — signup + Monday 7am UTC, scores grants, Claude match reasons
+- [x] 03-04: Agent 5 (capital-lender-matcher) — signup + Monday 6am UTC, scores lenders, FTC disclosure
+- [x] 03-05: Agent 8 (capital-credit-coach) — signup all paid tiers, 6-step credit roadmap, educational only
 
 ### Phase 4: Client Dashboard
 **Goal**: Full client dashboard with grants, lenders, credit, approvals, documents, and realtime notifications.
