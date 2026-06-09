@@ -1,0 +1,7 @@
+Contact: mailto:security@cosbycapital.com
+Expires: 2027-06-09T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://cosbycapital.com/.well-known/security.txt
+Policy: https://cosbycapital.com/security-policy
+Acknowledgments: https://cosbycapital.com/security-policy#acknowledgments
+Hiring: https://cosbycapital.com/careers
