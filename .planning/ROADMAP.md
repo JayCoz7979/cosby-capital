@@ -46,11 +46,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 02-01: Supabase Auth setup + auth pages (login, signup with Turnstile, forgot-password, verify-email)
-- [ ] 02-02: Device fingerprint + trusted_devices + OTP flow
-- [ ] 02-03: 6-step onboarding wizard (basics → goals → flags → KYB/OFAC → e-signature → Stripe)
-- [ ] 02-04: SignatureModal component + execute-signature edge function + PDF generation
-- [ ] 02-05: Stripe billing — 4 tiers × 2 periods, webhook handler, customer portal
+- [x] 02-01: Supabase Auth setup + auth pages (login, signup with Turnstile, forgot-password, verify-email)
+- [x] 02-02: Device fingerprint + trusted_devices + OTP flow
+- [x] 02-03: 6-step onboarding wizard (basics → goals → flags → KYB/OFAC → e-signature → Stripe)
+- [x] 02-04: SignatureModal component + execute-signature edge function + PDF generation
+- [x] 02-05: Stripe billing — 4 tiers × 2 periods, webhook handler, customer portal
 
 ### Phase 3: Agent Infrastructure + Core Agents
 **Goal**: 5 core agents deployed on Railway with no public HTTP domains, circuit breakers, shared utilities.
