@@ -30,7 +30,7 @@ Building Cosby Capital from a secure Next.js foundation through 18 autonomous AI
 
 Plans:
 - [x] 01-01: Project scaffold — package.json, tsconfig, Tailwind, PostCSS, next.config.js with full security headers
-- [ ] 01-02: GitHub security files — workflows (security, CodeQL, SBOM, Supabase, trust-check, version-gate), PR template, dependabot, security.txt, vercel.json
+- [x] 01-02: GitHub security files — workflows (security, CodeQL, SBOM, Supabase, trust-check, version-gate), PR template, dependabot, security.txt, vercel.json
 - [ ] 01-03: Supabase migrations — initial schema, RLS policies, security tables (trusted_devices, processed_webhook_events, active_sessions, deletion_requests, admin_audit_log, platform_settings, api_keys, exploit_chains)
 - [ ] 01-04: Shared security utilities + middleware — lib/logger.ts, lib/sanitize.ts, lib/auth.ts, lib/validate.ts, lib/api-error.ts, lib/supabase.ts, middleware.ts, src/app layout
 
