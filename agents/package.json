@@ -1,0 +1,7 @@
+{
+  "name": "cosby-capital-agents",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["capital-*"],
+  "engines": { "node": ">=20.0.0" }
+}
