@@ -8,17 +8,20 @@
  * - Rate limit messaging after 5 failed attempts (Supabase enforces server-side)
  * - Turnstile bot protection widget
  * - Zod validation on submit before calling Supabase
+ * - Device fingerprint check after login — unrecognized devices trigger OTP step-up
+ * - No NODE_ENV bypass for device trust check
  */
 
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { z } from "zod";
 import { createBrowserClient } from "@/lib/supabase";
 import { loginSchema } from "@/lib/validate";
+import { generateFingerprint } from "@/lib/device-fingerprint";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DeviceTrustModal } from "@/components/auth/DeviceTrustModal";
 
 const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
@@ -36,6 +39,10 @@ export default function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const turnstileRef = useRef<HTMLDivElement>(null);
+
+  // Device trust state
+  const [showDeviceModal, setShowDeviceModal] = useState(false);
+  const [fingerprintHash, setFingerprintHash] = useState("");
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -97,7 +104,35 @@ export default function LoginPage() {
 
         if (hasTOTP) {
           router.push("/auth/verify-2fa");
-        } else {
+          return;
+        }
+
+        // ── Device fingerprint check ──────────────────────────────────────
+        // Generate fingerprint client-side and check against trusted_devices.
+        // No NODE_ENV bypass — always enforced.
+        try {
+          const fingerprint = await generateFingerprint();
+          setFingerprintHash(fingerprint);
+
+          const deviceRes = await fetch("/api/auth/check-device", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ fingerprint_hash: fingerprint }),
+          });
+
+          const deviceData = (await deviceRes.json()) as { trusted?: boolean };
+
+          if (deviceData.trusted) {
+            // Known device — proceed directly to dashboard
+            router.push("/dashboard");
+          } else {
+            // Unknown device — show OTP step-up modal
+            setLoading(false);
+            setShowDeviceModal(true);
+          }
+        } catch {
+          // Fingerprint or check-device failure — fail open, proceed to dashboard
+          // (device check is step-up security, not a hard gate on login)
           router.push("/dashboard");
         }
       } catch {
@@ -108,7 +143,20 @@ export default function LoginPage() {
     [email, password, router]
   );
 
+  const handleDeviceVerified = useCallback(() => {
+    setShowDeviceModal(false);
+    router.push("/dashboard");
+  }, [router]);
+
   return (
+    <>
+    {/* Device trust step-up modal — shown for unrecognized devices after login */}
+    <DeviceTrustModal
+      isOpen={showDeviceModal}
+      onVerified={handleDeviceVerified}
+      fingerprintHash={fingerprintHash}
+      userEmail={email}
+    />
     <Card>
       <CardHeader>
         <CardTitle>Sign in</CardTitle>
@@ -213,5 +261,6 @@ export default function LoginPage() {
         </p>
       </CardContent>
     </Card>
+    </>
   );
 }
