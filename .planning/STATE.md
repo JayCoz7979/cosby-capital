@@ -5,13 +5,13 @@ milestone_name: milestone
 status: ready_to_plan
 stopped_at: context exhaustion at 75% (2026-06-09)
 last_updated: "2026-06-09T16:23:37.476Z"
-last_activity: 2026-06-09 -- Plan 01-04 complete
+last_activity: 2026-06-09 -- Plan 02-04 complete
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 29
+  total_plans: 8
+  completed_plans: 8
+  percent: 36
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-09)
 ## Current Position
 
 Phase: 2
-Plan: Not started
-Status: Ready to plan
+Plan: 4 (complete)
+Status: Phase 2 complete — ready for Phase 3
 Last activity: 2026-06-09
 
-Progress: [████░░░░░░] 14%
+Progress: [████████░░] 36%
 
 ## Performance Metrics
 
@@ -73,7 +73,14 @@ Progress: [████░░░░░░] 14%
 - createServiceClient() guarded by 'server-only' import — prevents client bundle inclusion
 - Admin routes return 404 (not 403) for non-allowlisted IPs (route enumeration prevention)
 - validateRedirect() uses explicit path allowlist, rejects all absolute/protocol-relative URLs (GAP-258/259)
+- pdf-lib chosen over jsPDF for generate-pdf edge function (pure JS, no Node.js deps, Deno-compatible via esm.sh)
+- storage_verified=true gated on Supabase Storage SHA-256 re-verification only (S3/Drive optional at dev time)
+- signed_at set server-side in API route, never accepted from client (E-SIGN Act compliance)
+- Unicode NFC normalization applied to both typed name and owner_name before comparison (homograph attack prevention)
 - PostHog provider and Sentry error boundary deferred to providers plan (need 'use client' wrapper)
+- pdf-lib used in generate-pdf edge function (Deno-compatible via esm.sh); Dancing Script OTF not embedded in PDF — Helvetica-Oblique approximation used; production TODO
+- S3 and Google Drive triple-storage are graceful-degradation in dev; all three must be configured before production
+- INTERNAL_SERVICE_SECRET must be set in Supabase edge function secrets before production deployment
 
 ### Pending Todos
 
@@ -88,6 +95,6 @@ Progress: [████░░░░░░] 14%
 
 ## Session Continuity
 
-Last session: 2026-06-09T16:23:37.472Z
-Stopped at: context exhaustion at 75% (2026-06-09)
+Last session: 2026-06-09T00:00:00Z
+Stopped at: Plan 02-04 complete (2026-06-09)
 Resume file: None
