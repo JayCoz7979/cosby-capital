@@ -1,0 +1,112 @@
+name: Security Checks
+on:
+  pull_request:
+    branches: [main, staging]
+  push:
+    branches: [main]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+
+      # 1. Secret scanning with Gitleaks (S7-009)
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+      # 2. Dependency vulnerability check
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+      - name: npm audit (blocks on HIGH/CRITICAL)
+        run: |
+          npm audit --audit-level=high
+          if [ $? -ne 0 ]; then
+            echo "BLOCKED: Critical/high npm vulnerabilities found"
+            exit 1
+          fi
+
+      # 3. vm2 version check (13 critical CVEs in May 2026)
+      - name: Check vm2 version
+        run: |
+          VM2=$(npm ls vm2 --json 2>/dev/null | jq -r '.dependencies.vm2.version // "not installed"')
+          if [ "$VM2" != "not installed" ]; then
+            echo "vm2 found: $VM2"
+            REQUIRED="3.11.2"
+            if [ "$(printf '%s\n' "$REQUIRED" "$VM2" | sort -V | head -n1)" != "$REQUIRED" ]; then
+              echo "BLOCKED: vm2 $VM2 < $REQUIRED (13 critical CVEs)"
+              exit 1
+            fi
+          fi
+          echo "vm2 check: OK"
+
+      # 4. Next.js version gate (CVEs patched in 15.5.18) — S11-002
+      - name: Verify Next.js version
+        run: |
+          NEXT=$(node -e "console.log(require('./node_modules/next/package.json').version)")
+          REQUIRED="15.5.18"
+          if [ "$(printf '%s\n' "$REQUIRED" "$NEXT" | sort -V | head -n1)" != "$REQUIRED" ]; then
+            echo "BLOCKED: Next.js $NEXT < $REQUIRED — live CVEs"
+            exit 1
+          fi
+          echo "Next.js version $NEXT — OK"
+
+      # 5. Hardcoded trust logic patterns
+      - name: Check for hardcoded trust patterns
+        run: |
+          if grep -rn \
+            "isAdmin\s*=\s*true\|skipAuth\|bypassAuth\|NODE_ENV.*development.*skip\
+            \|bypass.*auth\|trusted\s*=\s*true\|x-internal.*trust" \
+            --include="*.ts" --include="*.tsx" --include="*.js" \
+            app/ lib/ agents/ 2>/dev/null; then
+            echo "BLOCKED: Hardcoded trust pattern detected"
+            exit 1
+          fi
+          echo "Trust logic check: PASSED"
+
+      # 6. No NEXT_PUBLIC_ secrets
+      - name: Check for secret env vars with NEXT_PUBLIC_ prefix
+        run: |
+          if grep -rn "NEXT_PUBLIC_.*\(SECRET\|KEY\|TOKEN\|PASSWORD\)" \
+            --include="*.ts" --include="*.tsx" --include="*.js" \
+            --include="*.env*" . 2>/dev/null | grep -v ".env.example"; then
+            echo "BLOCKED: Secret key found with NEXT_PUBLIC_ prefix"
+            exit 1
+          fi
+          echo "NEXT_PUBLIC_ secret check: PASSED"
+
+      # 7. No .claude directory committed
+      - name: Check for Claude config files
+        run: |
+          if git log --all --full-history --name-only -- ".claude/" "*.claude.json" | grep -q "."; then
+            echo "WARNING: .claude directory found in git history"
+            echo "Run: git log --all -- '.claude/' to review"
+            # Warning only — don't block (historical commits can't be easily fixed in CI)
+          fi
+          if git diff --cached --name-only | grep -q "\.claude"; then
+            echo "BLOCKED: Attempting to commit .claude directory"
+            exit 1
+          fi
+          echo "Claude config check: PASSED"
+
+      # 8. Semgrep SAST (S7-009)
+      - name: Semgrep scan
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/typescript
+            p/javascript
+            p/owasp-top-ten
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
