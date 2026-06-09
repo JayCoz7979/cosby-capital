@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, DM_Sans } from "next/font/google";
+import { Playfair_Display, DM_Sans, Dancing_Script } from "next/font/google";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -11,6 +11,12 @@ const playfair = Playfair_Display({
 const dmSans = DM_Sans({
   subsets: ["latin"],
   variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing",
   display: "swap",
 });
 
@@ -48,7 +54,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${playfair.variable} ${dmSans.variable}`}
+      className={`${playfair.variable} ${dmSans.variable} ${dancingScript.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen flex flex-col">
