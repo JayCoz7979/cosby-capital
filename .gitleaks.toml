@@ -1,0 +1,47 @@
+[extend]
+useDefault = true
+
+[[rules]]
+id = "anthropic-api-key"
+regex = '''sk-ant-api[0-9]{2}-[a-zA-Z0-9\-_]{93}AA'''
+description = "Anthropic Claude API Key"
+keywords = ["sk-ant-api"]
+
+[[rules]]
+id = "supabase-service-role"
+regex = '''eyJ[a-zA-Z0-9+/=]{100,}'''
+description = "Supabase JWT (service_role or anon key)"
+keywords = ["eyJ"]
+
+[[rules]]
+id = "railway-api-token"
+regex = '''railway_[a-zA-Z0-9]{40,}'''
+description = "Railway API token"
+keywords = ["railway_"]
+
+[[rules]]
+id = "resend-api-key"
+regex = '''re_[a-zA-Z0-9]{30,}'''
+description = "Resend API key"
+keywords = ["re_"]
+
+[[rules]]
+id = "stripe-restricted-key"
+regex = '''rk_(live|test)_[a-zA-Z0-9]{24,}'''
+description = "Stripe Restricted Key"
+keywords = ["rk_live", "rk_test"]
+
+[[rules]]
+id = "internal-service-secret"
+regex = '''INTERNAL_SERVICE_SECRET\s*=\s*[a-zA-Z0-9]{32,}'''
+description = "Cosby Capital internal service secret"
+
+[[rules]]
+id = "claude-config-file"
+path = '''(\.claude\.json|\.claude/)'''
+description = "Claude Code configuration file — never commit"
+
+[[rules]]
+id = "codegraph-dir"
+path = '''\.codegraph/'''
+description = "Codegraph index — never commit"
