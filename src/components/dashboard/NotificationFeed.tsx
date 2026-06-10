@@ -21,6 +21,21 @@ import { useNotificationContext } from "@/components/dashboard/NotificationConte
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Button } from "@/components/ui/button";
 
+// Validate action_url before rendering as a link — prevents javascript: XSS
+// and open redirects to external domains (CR-03).
+function isSafeActionUrl(url: string | null): boolean {
+  if (!url) return false
+  // Allow relative paths (most common case for internal navigation)
+  if (url.startsWith('/')) return true
+  // Allow absolute URLs on the same origin only
+  try {
+    const parsed = new URL(url)
+    return parsed.origin === window.location.origin
+  } catch {
+    return false
+  }
+}
+
 export interface Notification {
   id: string;
   type: string;
@@ -175,8 +190,8 @@ export function NotificationFeed({
                     </p>
                   )}
 
-                  {/* Action link */}
-                  {n.action_url && (
+                  {/* Action link — only rendered for safe relative/same-origin URLs (CR-03) */}
+                  {n.action_url && isSafeActionUrl(n.action_url) && (
                     <Link
                       href={n.action_url}
                       className="text-[#2D5016] text-xs hover:underline font-body mt-1 block pl-4"
