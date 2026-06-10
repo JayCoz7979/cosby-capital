@@ -64,6 +64,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
       .eq('client_id', client.id)
       .eq('requires_client_approval', true)
       .eq('client_approved', false)
+      .eq('client_rejected', false)
       .order('created_at', { ascending: false })
 
     if (queryError) {
@@ -163,12 +164,13 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     const updatePayload =
       action === 'approve'
         ? { client_approved: true, client_approved_at: new Date().toISOString() }
-        : { client_approved: false, client_approved_at: new Date().toISOString() }
+        : { client_approved: false, client_rejected: true, client_approved_at: new Date().toISOString() }
 
     const { error: updateError } = await serviceClient
       .from('agent_emails')
       .update(updatePayload)
       .eq('id', id)
+      .eq('client_id', client.id) // defense-in-depth: scope update to owning client
 
     if (updateError) {
       logger.error('approvals PATCH: update failed', updateError)
