@@ -25,7 +25,7 @@ export default async function DocumentsPage() {
   } = await supabase.auth.getSession()
 
   if (!session) {
-    redirect('/login')
+    redirect('/auth/login?redirect=/dashboard/documents')
   }
 
   const userId = session.user.id
