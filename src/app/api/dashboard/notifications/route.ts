@@ -146,9 +146,17 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
     }
 
     if (ids !== undefined) {
-      // Validate ids is a non-empty array
-      if (!Array.isArray(ids) || ids.length === 0) {
-        return NextResponse.json({ error: 'ids must be a non-empty array' }, { status: 400 })
+      // Validate ids is a non-empty array of UUID-formatted strings (WR-04)
+      const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      if (
+        !Array.isArray(ids) ||
+        ids.length === 0 ||
+        !ids.every((id) => typeof id === 'string' && UUID_RE.test(id))
+      ) {
+        return NextResponse.json(
+          { error: 'ids must be a non-empty array of UUIDs' },
+          { status: 400 }
+        )
       }
 
       // T-04-06-02: .eq('client_id', client.id) scopes the update to only this client's notifications
