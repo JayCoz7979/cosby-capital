@@ -22,7 +22,7 @@ export interface ConfirmDialogProps {
   body: string
   confirmLabel: string
   cancelLabel?: string
-  onConfirm: () => void
+  onConfirm: () => void | Promise<void>
   variant?: 'destructive' | 'default'
 }
 
@@ -78,8 +78,8 @@ export function ConfirmDialog({
             {variant === 'destructive' ? (
               <button
                 tabIndex={1}
-                onClick={() => {
-                  onConfirm()
+                onClick={async () => {
+                  await onConfirm()
                   onOpenChange(false)
                 }}
                 className={cn(
@@ -96,8 +96,8 @@ export function ConfirmDialog({
               <Button
                 variant="primary"
                 tabIndex={1}
-                onClick={() => {
-                  onConfirm()
+                onClick={async () => {
+                  await onConfirm()
                   onOpenChange(false)
                 }}
               >
