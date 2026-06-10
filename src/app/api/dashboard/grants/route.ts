@@ -75,16 +75,18 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     let query = serviceClient
       .from('grant_matches')
       .select(
-        'id, match_score, match_reasons, eligibility_flags, status, recommended_action, grants(id, name, grantor, grantor_type, description, min_award_amount, max_award_amount, application_deadline, source_url)',
+        'id, match_score, match_reasons, eligibility_flags, status, recommended_action, grants!inner(id, name, grantor, grantor_type, description, min_award_amount, max_award_amount, application_deadline, source_url)',
         { count: 'exact' }
       )
       .eq('client_id', client.id)
       .order(orderColumn, { ascending })
       .range(rangeFrom, rangeTo)
 
-    // Apply grantor_type filter when not 'all'
+    // Apply grantor_type filter when not 'all'.
+    // !inner join ensures rows without a matching grant are excluded.
+    // .eq() on the joined table works correctly with an inner join (CR-04).
     if (typeParam && typeParam !== 'all') {
-      query = query.filter('grants.grantor_type', 'eq', typeParam)
+      query = query.eq('grants.grantor_type', typeParam)
     }
 
     const { data: matches, error: matchesError, count } = await query
