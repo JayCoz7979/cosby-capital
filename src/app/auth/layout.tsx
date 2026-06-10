@@ -18,14 +18,14 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#0A1628] flex flex-col">
+    <div className="min-h-screen bg-[#1a2e0d] flex flex-col">
       {/* Header with logo */}
       <header className="flex justify-center pt-10 pb-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold font-heading text-[#C9A84C] tracking-tight">
             Cosby Capital
           </h1>
-          <p className="text-xs text-gray-400 font-body mt-1 tracking-widest uppercase">
+          <p className="text-xs text-gray-300 font-body mt-1 tracking-widest uppercase">
             Your Capital. Your Future. Unlocked.
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function AuthLayout({
 
       {/* Footer */}
       <footer className="py-6 text-center">
-        <p className="text-xs text-gray-500 font-body">
+        <p className="text-xs text-gray-400 font-body">
           Powered by{" "}
           <a
             href="https://cosbyaisolutions.com"

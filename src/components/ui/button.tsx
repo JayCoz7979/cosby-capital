@@ -45,19 +45,19 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           size === "lg" && "px-6 py-3 text-base",
           // Color variants
           variant === "primary" && [
-            "bg-[#0A1628] text-[#C9A84C]",
-            "hover:bg-[#0d1f38] active:bg-[#060e1a]",
+            "bg-[#2D5016] text-[#C9A84C]",
+            "hover:bg-[#3d6b1e] active:bg-[#1a2e0d]",
             "focus:ring-[#C9A84C]",
           ],
           variant === "secondary" && [
-            "bg-white text-[#0A1628] border border-[#0A1628]",
+            "bg-white text-[#2D5016] border border-[#2D5016]",
             "hover:bg-gray-50 active:bg-gray-100",
-            "focus:ring-[#0A1628]",
+            "focus:ring-[#2D5016]",
           ],
           variant === "ghost" && [
-            "bg-transparent text-[#0A1628]",
+            "bg-transparent text-[#2D5016]",
             "hover:bg-gray-100 active:bg-gray-200",
-            "focus:ring-[#0A1628]",
+            "focus:ring-[#2D5016]",
           ],
           className
         )}
