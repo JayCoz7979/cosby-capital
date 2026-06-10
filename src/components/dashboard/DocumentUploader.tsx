@@ -91,7 +91,10 @@ export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
         return
       }
 
-      // Upload succeeded — move to scanning state
+      // Upload succeeded — parse response immediately while body is fresh
+      const doc = (await res.json()) as UploadedDoc
+
+      // Move to scanning state (visual feedback)
       setUploadProgress(100)
       setUploadState('scanning')
 
@@ -99,8 +102,6 @@ export function DocumentUploader({ onUploadComplete }: DocumentUploaderProps) {
       await new Promise((r) => setTimeout(r, 1500))
 
       setUploadState('complete')
-
-      const doc = (await res.json()) as UploadedDoc
       onUploadComplete(doc)
     } catch {
       setUploadState('error')
