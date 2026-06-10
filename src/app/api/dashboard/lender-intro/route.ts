@@ -112,8 +112,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       .maybeSingle()
 
     if (existingIntro) {
+      // NOTE: duplicate check is scoped to client only (not per-lender) until
+      // lender_id is stored on agent_emails rows (WR-02 / IN-04). Error message
+      // reflects the actual behaviour rather than claiming it is lender-specific.
       return NextResponse.json(
-        { error: 'Introduction already requested for this lender' },
+        { error: 'An introduction is already pending for your account.' },
         { status: 409 }
       )
     }
