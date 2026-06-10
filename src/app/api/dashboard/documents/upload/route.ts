@@ -110,6 +110,31 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       .map((b) => b.toString(16).padStart(2, '0'))
       .join('')
 
+    // ── ClamAV virus scan (before storage upload — infected files must never reach storage) ──
+    if (process.env.CLAMAV_WEBHOOK_URL) {
+      try {
+        const scanRes = await fetch(process.env.CLAMAV_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream' },
+          body: buffer,
+        })
+        const scanResult = (await scanRes.json()) as { clean: boolean }
+
+        if (scanResult.clean === false) {
+          return NextResponse.json(
+            {
+              error:
+                'This file was blocked by our security scanner. Please verify the file and try uploading again.',
+            },
+            { status: 422 }
+          )
+        }
+      } catch (scanErr) {
+        logger.error('documents/upload: ClamAV scan request failed', scanErr)
+        return NextResponse.json({ error: 'Upload failed. Please try again.' }, { status: 500 })
+      }
+    }
+
     // ── Generate storage path ─────────────────────────────────────────────────
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
     const storagePath = `clients/${client.id}/${Date.now()}_${safeName}`
@@ -122,35 +147,6 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     if (storageError) {
       logger.error('documents/upload: storage upload failed', storageError)
       return NextResponse.json({ error: 'Upload failed. Please try again.' }, { status: 500 })
-    }
-
-    // ── ClamAV virus scan (optional — skipped in dev if env var not set) ──────
-    if (process.env.CLAMAV_WEBHOOK_URL) {
-      try {
-        const scanRes = await fetch(process.env.CLAMAV_WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/octet-stream' },
-          body: buffer,
-        })
-        const scanResult = (await scanRes.json()) as { clean: boolean }
-
-        if (scanResult.clean === false) {
-          // Remove infected file from storage
-          await serviceClient.storage.from('client-documents').remove([storageData.path])
-          return NextResponse.json(
-            {
-              error:
-                'This file was blocked by our security scanner. Please verify the file and try uploading again.',
-            },
-            { status: 422 }
-          )
-        }
-      } catch (scanErr) {
-        logger.error('documents/upload: ClamAV scan request failed', scanErr)
-        // If scan fails, remove file from storage and return error
-        await serviceClient.storage.from('client-documents').remove([storageData.path])
-        return NextResponse.json({ error: 'Upload failed. Please try again.' }, { status: 500 })
-      }
     }
 
     // ── Insert into client_documents ──────────────────────────────────────────
