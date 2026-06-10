@@ -8,7 +8,7 @@
  * - Pagination: 10 items/page, simple prev/next buttons
  */
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { SearchFilterBar, FilterOption } from './SearchFilterBar'
 import { GrantMatchCard, GrantMatch } from './GrantMatchCard'
 import { Button } from '@/components/ui/button'
@@ -38,6 +38,13 @@ export function GrantMatchList({ initialMatches, initialTotal, tier: _tier }: Gr
   const [filterType, setFilterType] = useState('all')
   const [sortOrder, setSortOrder] = useState('score_desc')
 
+  // Refs so callbacks always read current filter/sort without stale closure (CR-05)
+  const filterTypeRef = useRef(filterType)
+  const sortOrderRef = useRef(sortOrder)
+
+  useEffect(() => { filterTypeRef.current = filterType }, [filterType])
+  useEffect(() => { sortOrderRef.current = sortOrder }, [sortOrder])
+
   const PER_PAGE = 10
 
   async function fetchMatches(nextPage: number, type: string, sort: string) {
@@ -66,23 +73,15 @@ export function GrantMatchList({ initialMatches, initialTotal, tier: _tier }: Gr
     setSearchTerm(term)
   }, [])
 
-  const handleFilter = useCallback(
-    (type: string) => {
-      setFilterType(type)
-      fetchMatches(0, type, sortOrder)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [sortOrder]
-  )
+  const handleFilter = useCallback((type: string) => {
+    setFilterType(type)
+    fetchMatches(0, type, sortOrderRef.current)
+  }, []) // sortOrderRef.current is always up-to-date — no stale closure (CR-05)
 
-  const handleSort = useCallback(
-    (sort: string) => {
-      setSortOrder(sort)
-      fetchMatches(0, filterType, sort)
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [filterType]
-  )
+  const handleSort = useCallback((sort: string) => {
+    setSortOrder(sort)
+    fetchMatches(0, filterTypeRef.current, sort)
+  }, []) // filterTypeRef.current is always up-to-date — no stale closure (CR-05)
 
   // Client-side search filter on current page results
   const visibleMatches = searchTerm
