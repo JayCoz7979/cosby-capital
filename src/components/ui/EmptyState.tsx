@@ -1,8 +1,10 @@
+'use client'
+
 /**
  * EmptyState — centered placeholder with heading, body, and optional CTA.
  *
- * Used throughout the dashboard when a collection has no items.
- * No 'use client' — renders as a server component.
+ * Marked 'use client' because the onClick CTA variant passes an event
+ * handler, which is a client-only operation (WR-07).
  */
 
 import * as React from 'react'
