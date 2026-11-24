@@ -337,7 +337,7 @@ export type OnboardingStep6 = z.infer<typeof onboardingStep6Schema>;
 
 export const saveStepSchema = z.object({
   step: z.number().int().min(1).max(6),
-  data: z.record(z.unknown()),
+  data: z.record(z.string(), z.unknown()),
 });
 
 export type SaveStep = z.infer<typeof saveStepSchema>;

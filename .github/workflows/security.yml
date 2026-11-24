@@ -28,13 +28,8 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci --ignore-scripts
-      - name: npm audit (blocks on HIGH/CRITICAL)
-        run: |
-          npm audit --audit-level=high
-          if [ $? -ne 0 ]; then
-            echo "BLOCKED: Critical/high npm vulnerabilities found"
-            exit 1
-          fi
+      - name: npm audit production (blocks on HIGH/CRITICAL)
+        run: npm run audit:prod
 
       # 3. vm2 version check (13 critical CVEs in May 2026)
       - name: Check vm2 version
@@ -50,11 +45,11 @@ jobs:
           fi
           echo "vm2 check: OK"
 
-      # 4. Next.js version gate (CVEs patched in 15.5.18) — S11-002
+      # 4. Next.js version gate (CVEs patched in 15.5.29) — S11-002 / H7
       - name: Verify Next.js version
         run: |
           NEXT=$(node -e "console.log(require('./node_modules/next/package.json').version)")
-          REQUIRED="15.5.18"
+          REQUIRED="15.5.29"
           if [ "$(printf '%s\n' "$REQUIRED" "$NEXT" | sort -V | head -n1)" != "$REQUIRED" ]; then
             echo "BLOCKED: Next.js $NEXT < $REQUIRED — live CVEs"
             exit 1
