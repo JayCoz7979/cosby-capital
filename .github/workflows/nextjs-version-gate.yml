@@ -7,10 +7,10 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
-      - name: Verify Next.js version >= 15.5.18 (S11-002)
+      - name: Verify Next.js version >= 15.5.29 (S11-002 / H7)
         run: |
           NEXT_VERSION=$(node -e "const p = require('./package.json'); console.log(p.dependencies.next || p.devDependencies.next)")
-          MIN_VERSION="15.5.18"
+          MIN_VERSION="15.5.29"
           if [ "$(printf '%s\n' "$MIN_VERSION" "$NEXT_VERSION" | sort -V | head -n1)" != "$MIN_VERSION" ]; then
             echo "BLOCKED: Next.js $NEXT_VERSION is below minimum required $MIN_VERSION (CVE patch)"
             exit 1
